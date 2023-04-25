@@ -277,3 +277,71 @@ public class KoreaPizzaStore extends PizzaStore{
 - `PizzaStore`에서 `createPizza()` 추상 메서드를 제작하여, `PizaaStore`를 상속받은 서브클래스들이 생성관련 책임을 가지도록한다.
 - `PizaaStore`는 더 이상 피자 생성 내용이 변경된다고 해도 코드가 변경되지 않는다.
 > createPizza 메서드에서 String 타입의 매개변수를 활용하여 피자 생성을 하는데, 잘못된 값을 전닳여 런타임 오류가 발생할 수 있다. 이를 방지하기 위해서 정적 상수나 enum타입을 사용하는 것이 더 좋을 수 있다.  
+
+### 4. 추상 팩토리 패턴 (Abstract Factory Pattern)
+---
+
+- 추상 팩토리 패턴은 ***오직 생성과 관련된 것(들)을 인터페이스를 통해 제공하는 패턴***이다.
+  - 팩토리 메서드 패턴은 상속을 통하여 하위 클래스에게 객체 생성 책임을 맡기는 패턴이다.
+    ```java
+    public abstract class PizzaStore {
+
+        public Pizza orderPizza(String pizzaType){
+            Pizza pizza = this.createPizza(pizzaType);
+            //피자를 준비하는 과정은 전부 동일하다.
+            pizza.prepare();
+            pizza.bake();
+            pizza.cut();
+            pizza.box();
+            return pizza;
+        }
+        //생성 관련 책임을 추상 메서드에게 전가
+        public abstract Pizza createPizza(String pizzaType);
+    }
+    ```
+  - 추상 팩토리 패턴은 ***인터페이스를 구현한 클래스들이 객체 생성의 일을 하고, 해당 인터페이스를 주입받아서 사용(객체 구성)하는 패턴***이다.  
+    ```java
+    //피자 생성 관련 인터페이스
+    public interface PizzaFactory {
+
+        Pizza createPizza(String pizzaType);
+    }
+
+    public abstract class PizzaStore {
+        //팩토리 객체를 구성
+        private final PizzaFactory pizzaFactory;
+        public PizzaStore(PizzaFactory pizzaFactory) {
+            this.pizzaFactory = pizzaFactory;
+        }
+
+        public Pizza orderPizza(String pizzaType){
+            Pizza pizza = pizzaFactory.createPizza(pizzaType);
+            //피자를 준비하는 과정은 전부 동일하다.
+            pizza.prepare();
+            pizza.bake();
+            pizza.cut();
+            pizza.box();
+            return pizza;
+        }
+    }
+    ```
+
+#### 4.1. 추상 팩토리 패턴을 사용하는 경우
+- `PizzaStore`를 통해서 추상 팩토리 패턴(객체 구성)과 팩토리 메서드 패턴(상속)의 차이점에 대해서 알아보았다.
+- `Pizza`라는 클래스 하나를 생성하기 위해서 인터페이스를 구현하고, 해당 인터페이스를 구현한 클래스들을 각각 만드는 추상 팩토리 패턴이 번거롭다고 생각할 수 있다.
+- 만약 `PizzaStore`에서 햄버거도 팔고, 피자도 팔고, 장남감도 팔고 한다면 어떻겠는가?
+  - 팩토리 메서드 패턴의 경우에 생성관련 내용을 추상화 했지만, 하나의 클래스에 다양한 역할(생성, 주문)을 외부(protected, public)에 제공할 수 있기 때문에 ***해당 클래스를 사용하는 사용자들에게 너무 많은 정보를 공개한다는 문제점***이 있다. 
+  - 뿐만아니라 ***하위 클래스에서 상위 클래스를 조작할 위험성이 존재***한다. (ex 오버라이딩)
+- 때문에 ***추상 팩토리 패턴은 객체를 생성하는 역할만 하기 때문에 생성과 관련된 책임을 완전히 분리***시킬 수 있다.
+  - 특히 ***연관된 객체 생성 메서드들을 묶어 놓은 용도로 사용할 때 유용***하다.
+
+
+### 결론
+---
+
+- 객체 생성관련된 일을 분리하고자 할때 팩토리 패턴을 사용한다.
+- 하지만 한정된 자원에서 모든 생성 관련 책임을 분리하고자 하는 행위는 개발 속도를 떨어트릴 뿐만 아니라 흥미도 잃을 수 있다.
+  - 때문에 적재 적소에 팩토리 패턴을 사용하는 것이 좋다.
+  - 오히려 모든 것을 인터페이스 바탕으로 제작하고자 할때 이해하기 힘든 코드가 될 수도 있다.
+- 처음에는 간단한 팩토리 기법을 통해서 생성 관련 책임을 분리하고, 이후 팩토리 메서드 패턴이나 추상 팩토리을 사용하여 생성 관련 코드를 추상화 해보는 것이 좋다.
+

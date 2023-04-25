@@ -1,6 +1,5 @@
 package com.example.factorypattern.factory_method_pattern;
 
-import com.example.factorypattern.simple_factory.Pizza;
 
 public abstract class PizzaStore {
 

@@ -1,7 +1,7 @@
-package com.example.factorypattern.factory_method_pattern;
+package com.example.factorypattern.abstract_factory_pattern;
 
 
-public class KoreaPizzaStore extends PizzaStore{
+public class KoreaPizzaFactory implements PizzaFactory {
     @Override
     public Pizza createPizza(String pizzaType) {
         Pizza pizza = null;
