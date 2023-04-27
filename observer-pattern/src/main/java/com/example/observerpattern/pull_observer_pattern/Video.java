@@ -18,11 +18,4 @@ public class Video {
         return content;
     }
 
-    @Override
-    public String toString() {
-        return "Video{" +
-                "subject='" + subject + '\'' +
-                ", content='" + content + '\'' +
-                '}';
-    }
 }

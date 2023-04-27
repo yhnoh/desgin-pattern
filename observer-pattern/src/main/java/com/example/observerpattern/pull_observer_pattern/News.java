@@ -1,11 +1,11 @@
-package com.example.observerpattern.observer_pattern;
+package com.example.observerpattern.pull_observer_pattern;
 
-public class Video {
 
+public class News {
     private String subject;
     private String content;
 
-    public Video(String subject, String content) {
+    public News(String subject, String content) {
         this.subject = subject;
         this.content = content;
     }

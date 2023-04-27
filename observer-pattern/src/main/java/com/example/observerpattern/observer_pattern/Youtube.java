@@ -24,6 +24,7 @@ public class Youtube implements Subject{
         }
     }
 
+    //비디오 업로드시 옵저버들에게 알림
     public void uploadVideo(Video video){
         this.video = video;
         this.notifyObserver();

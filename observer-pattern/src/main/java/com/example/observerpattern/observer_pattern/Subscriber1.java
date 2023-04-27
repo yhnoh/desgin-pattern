@@ -12,14 +12,13 @@ public class Subscriber1 implements Observer, Notify {
     public void update(Video video) {
         this.subject = video.getSubject();
         this.content = video.getContent();
-        this.sendNotification();
+        this.showNotification();
     }
-
+    //알람 받기
     @Override
-    public void sendNotification() {
+    public void showNotification() {
         System.out.println("구독자1에게 업로드된 영상 알람을 보냈습니다.");
         System.out.println("영상 제목 = " + subject  + ", 영상 내용 = " + content);
 
     }
-
 }
