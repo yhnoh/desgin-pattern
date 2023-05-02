@@ -1,4 +1,4 @@
-package com.example.strategypattern;
+package com.example.strategypattern.before;
 
 //나무 오리 울기(X), 날기(X), 수영(X)
 public class WoodDuck extends Duck{

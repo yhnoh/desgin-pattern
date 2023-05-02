@@ -1,4 +1,4 @@
-package com.example.strategypattern;
+package com.example.strategypattern.before;
 
 /**
  * 오리의 추상 클래스
