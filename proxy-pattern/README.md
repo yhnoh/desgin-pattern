@@ -177,4 +177,7 @@ public class MemberServiceImpl implements MemberService {
 - `MemberService`가 내에서 시간을 측정하는 코드 작성과 역할을 `MemberServiceProxy`가 대신 하고 있다.
 - 부가 기능에 대한 로직 수정, 삭제, 추가를 `MemberService`가 아닌 `MemberServiceProxy`에서 하게되어 더이상 `MemberService`의 코드를 수정할 필요가 없다.
 - 기존에는 `MemberSerivce`내에 실제 기능과 부가기능이 함께 있기 때문에 `MemberSerivce`만의 기능을 활용하기 힘들었지만 부가 기능은 프록시를 통해서 이용하기 때문에 `MemberSerivce`의 실제 기능도 사용할 수 있게 되었다.
+- 프록시 패턴을 활용하여 좀 더 나은 기능을 만들어 보았지만 이 코드에서도 문제적이 있다.
+  - 만약 다른 서비스 코드에서도 시간을 재는 로직이 필요할 경우 계속해서 프록시를 만들어주어야한다.
 
+- 프록시는 단일 기능을 위해서 사용하기에는 코드 복잡도가 너무 올라가기 때문에 일부분 또는 전체적인 부분을 수정하기위해서 만드는 것이 훨씬 효과적인 패턴으로 보인다.
