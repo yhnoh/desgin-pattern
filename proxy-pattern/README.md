@@ -1,5 +1,5 @@
 
-### 프록시 패턴 (Proxy Pattern)
+### 1. 프록시 패턴 (Proxy Pattern)
 ---
 
 - 프록시 패턴은 프록시 행위들을 코드로써 표현한 패턴이다.
@@ -16,12 +16,12 @@
   > 여기서 핵심은 실제 객체의 행위자체에 대해서 프록시 객체가 침범해서는 안된다.
 
 
-### 프록시 만들어보기
+### 2. 프록시 만들어보기
 ---
 
 - 모든 메서드가 걸리는 시간에 대해서 알고싶다는 요구사항이 들어왓다고 가정해보자.
 
-#### 1. 모든 코드에 구현해보기
+#### 2.1. 모든 코드에 구현해보기
 ```java
 public class MemberServiceImpl implements MemberService{
     @Override
@@ -55,8 +55,9 @@ public class MemberServiceImpl implements MemberService{
 - `MemberService`에 대한 모든 메서드에 시간을 알기위해서 모든 회원 가입과 탈퇴로직에 전부 추가했다.
 - 만약 부가적인 로직들이 추가될때 마다 `MemberService`에 작성한다고 생각해보자.
 - 무수히 많은 코드 중복이 일어날것이고 점점 실제 하는 행위에 대한 코드가 눈에 들어오지 않는 지경에 이르게 될 것이다.
+<br/><br/>
 
-#### 2. 부가 로직만 따로 역할 분리해보기
+#### 2.2. 부가 로직만 따로 역할 분리해보기
 ```java
 public class MemberServiceImpl implements MemberService {
 
@@ -101,20 +102,20 @@ public class MemberServiceImpl implements MemberService {
 ```
 - `MemberService`내에 `TimeChecker` 정적 클래스를 만들어서 메서드 실행시간을 구하는 로직을 따로 분리해보았다.
 - 코드 중복도 사라지고 꽤 괜찮은 코드라고 생각할 수 있지만 문제가 있다.
-  1. `TimeChecker` 클래스를 생성하여 모든 메서드에 감싸주어야 한다.
-  2. `MemberService`내에 있는 코드를 계속해서 수정해야한다. (실수 발생 가능성이 높다.)
-  3. `TimeChecker` 기능을 제외한 `MemberService` 만의 기능을 다른 곳에서 사용하고자 할때 사용할 수 없다. 
+  - `TimeChecker` 클래스를 생성하여 모든 메서드에 감싸주어야 한다.
+  - `MemberService`내에 있는 코드를 계속해서 수정해야한다. (실수 발생 가능성이 높다.)
+  - `TimeChecker` 기능을 제외한 `MemberService` 만의 기능을 다른 곳에서 사용하고자 할때 사용할 수 없다. 
+<br/><br/>
 
-#### 부가로직을 프록시로 만들어보기
-
+#### 2.3. 부가로직을 프록시로 만들어보기
 - 전체적인 구조
     ![](./img/member_service_proxy.png)
 
-- 코드
+- 코드 작성
     - MemberService
         ```java
         public class MemberServiceImpl implements MemberService {
-    
+
             @Override
             public void join(String id) {
                 System.out.println(id + "이 회원가입하였습니다.");
@@ -177,7 +178,60 @@ public class MemberServiceImpl implements MemberService {
 - `MemberService`가 내에서 시간을 측정하는 코드 작성과 역할을 `MemberServiceProxy`가 대신 하고 있다.
 - 부가 기능에 대한 로직 수정, 삭제, 추가를 `MemberService`가 아닌 `MemberServiceProxy`에서 하게되어 더이상 `MemberService`의 코드를 수정할 필요가 없다.
 - 기존에는 `MemberSerivce`내에 실제 기능과 부가기능이 함께 있기 때문에 `MemberSerivce`만의 기능을 활용하기 힘들었지만 부가 기능은 프록시를 통해서 이용하기 때문에 `MemberSerivce`의 실제 기능도 사용할 수 있게 되었다.
-- 프록시 패턴을 활용하여 좀 더 나은 기능을 만들어 보았지만 이 코드에서도 문제적이 있다.
+- 프록시 패턴을 활용하여 좀 더 나은 기능을 만들어 보았지만 이 코드에서도 문제점이 있다.
   - 만약 다른 서비스 코드에서도 시간을 재는 로직이 필요할 경우 계속해서 프록시를 만들어주어야한다.
+  - ***코드 중복이 지속적으로 일어날 수 있기 때문에 `동적 프록시`를 활용하여 해당 문제를 해결***해보자.
+<br/><br/>
+
+#### 2.4. 동적 프록시를 활용하여 부가로직 작성해보기
+
+- 동적 프록시와 필요성
+  - 위에서 여러 서비스에 모든 시간 측정 프록시를 만들게 되었을 때 어떤 문제가 있었는가?
+    - 모든 서비스의 프록시를 만들어 주어야 한다.
+    - 서비스의 메서드별로 시간 측정 코드가 중복적으로 발생한다.
+  - 컴파일 시점에는 이미 정해진 코드 내에서 프로그램이 돌아가기 때문에 위의 문제를 해결하기가 힘들다.
+  - 이 문제를 해결하기 위해서는 ***런타임 시점에 클래스의 타입과 각 메서드에 구애받지 않고 활용할 수 있는 프록시***를 만들어야한다.
+    - ***런타임 시점에 프록시 클래스를 만들어주는 방식을 동적 프록시***라고 한다.
+  - `java.lang.reflect` 패키지 내에서 동적 프록시를 만들 수 있는 기능들이 내장되어 있으며 해당 기능을 활용하여 런타임 시점에 코드를 조작할 수 있다.
+
+- 전체적인 구조
+  - ![](./img/member_service_dynamic_proxy.png)
+- 코드 작성
+  - InvocationHandler
+    ```java
+    public class TimeCheckerInvocationHandler implements InvocationHandler {
+
+        private Object service;
+        public TimeCheckerInvocationHandler(Object service) {
+            this.service = service;
+        }
+
+        //실제 service의 메서드 실행 뿐만 아니라, 시간을 측정하는 부가로직도 들어가 있다.
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+            long startTime = System.currentTimeMillis();
+            
+            //InvocationHandler가 실제 클래스의 메서드를 실행한다.
+            Object invoke = method.invoke(service, args);
+            
+            long endTime = System.currentTimeMillis();
+            System.out.println(endTime - startTime + "ms");
+            return invoke;
+        }
+    }
+    ```
+  - Proxy
+    ```java
+    //invocationHandler 생성
+    TimeCheckerInvocationHandler timeCheckerInvocationHandler = new TimeCheckerInvocationHandler(new MemberServiceImpl());
+    //Proxy 만들기
+    MemberService memberService = (MemberService) Proxy.newProxyInstance(MemberService.class.getClassLoader(),
+            new Class[]{MemberService.class},
+            timeCheckerInvocationHandler);
+    //Proxy 메서드 실행
+    memberService.join("id");
+    ```
+
 
 - 프록시는 단일 기능을 위해서 사용하기에는 코드 복잡도가 너무 올라가기 때문에 일부분 또는 전체적인 부분을 수정하기위해서 만드는 것이 훨씬 효과적인 패턴으로 보인다.
