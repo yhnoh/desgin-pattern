@@ -232,6 +232,49 @@ public class MemberServiceImpl implements MemberService {
     //Proxy 메서드 실행
     memberService.join("id");
     ```
+- `InvocationHander`와 `Proxy`를 통해서 시간측정을 하는 코드 중복을 줄였을 뿐만 아니라, 모든 서비스의 프록시를 직접 만들 일도 없어졌다.
+- InvocationHandler 인터페이스
+    ```java
+    package java.lang.reflect;
+        
+        public Object invoke(Object proxy, Method method, Object[] args)
+            throws Throwable;
+    }
+    ```
+    - 프록시 인스턴스의 메서드를 호출하게 될 경우 실행하게 되는 핸들로이다.
+    - 프록시 인스턴스, 실제 인스턴스의 메서드를 호출할 수 있는 메서드 인스턴스, 인자값을 통해서 부가 로직 뿐만 아니라 실제 인스턴스의 메서드를 호출할 수 있다.
+- Proxy 클래스
+    ```java
+    package java.lang.reflect;
+
+    //import ...
+
+    public class Proxy implements java.io.Serializable {
+        //...
+        @CallerSensitive
+        public static Object newProxyInstance(ClassLoader loader,
+                                            Class<?>[] interfaces,
+                                            InvocationHandler h) {
+                                                //...
+                                            }
+    }
+    ```
+    - `Proxy.newProxyInstance()` 정적 메서드를 활용하여 클래스를 생성할 수 있다.
+    - 클래스 로더, 프록시에서 구현해야하는 인터페이스, 호출 핸들러인 `InvocationHandler`의 정보를 통해서 프록시를 생성한다.
+- 실제로 동적 프록시를 통해 인스턴스를 생성하다 보면 해당 타입이 변경되었다는 것을 디버깅을 통해서 확인할 수 있다.
+  - `$Proxy, [클래스명]$$EnhancerBySpringCGLIB$$[해시코드]`
+- 동적 프록시를 활용한 코드 조작은 스프링 내부에서 많이 사용하고 있으며, 동적 프록시를 이해하는 것이 스프링의 동작 방식을 이해하는 것에 도움이 될 수 있다.
+  - AOP, CGLIB를 활용한 프록시 클래스 생성 등등...
+
+### 3. 프록시 패턴에 대해서 생각해보기
+- 프록시 패턴은 실제 행위하는 객체를 직접적으로 참조하는 것이 아닌 ***실제 객체를 대변하는 프록시 객체를 통해 대상 객체에 접근하는 방식***이다.
+- 프록시 패턴을 활용하면 ***기존 코드를 수정하지 않고 부가 로직을 확장할 수 있는 패턴***이다.
+  - OCP
+- 소스코드를 작성해야하는 곳 뿐만 아니라 시스템 아키텍쳐에서도 많이 활용되고 있기 때문에 어떤 시스템을 이해할 때도 아주 중요한 패턴이라고 생각이 된다.
+  - 포워드 프록시(forward proxy)와 리버스 프록시(reverse proxy)
+- 일단 소스코드 작성에 대해서만 생각해보면 단일 클래스에 대한 특정 행위에 대해서 프록시를 만드는 것은 한번 고민을 해봐야 한다.
+- 프록시는 단일 클래스를 위해서 사용하기에는 코드 복잡도가 올라가기 때문에 일부분 또는 전체적인 부분을 수정하기위해서 만드는 것이 훨씬 효과적인 패턴일 수 있다.
+- 항상 소스코드를 작성할 때는 내가 왜 이렇게 디자인 해야하는지에 대한 어느정도의 이유를 생각해보고 작성하는 것이 좋다.
 
 
-- 프록시는 단일 기능을 위해서 사용하기에는 코드 복잡도가 너무 올라가기 때문에 일부분 또는 전체적인 부분을 수정하기위해서 만드는 것이 훨씬 효과적인 패턴으로 보인다.
+> Spring AOP의 메커니즘과 Proxy Bean 생성: https://gmoon92.github.io/spring/aop/2019/02/23/spring-aop-proxy-bean.html
